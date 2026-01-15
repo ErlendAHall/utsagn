@@ -1,13 +1,14 @@
 from __future__ import annotations
 from typing import TypedDict
+from pydantic import BaseModel
 
 
-class Utsagn:
+class Utsagn(BaseModel):
     source: str
     date_found: str
     speaker: str
     party: str
-    utsagn: str
+    statement: str
 
 
 class UtsagnRecordMetadata(TypedDict):
