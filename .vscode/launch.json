@@ -5,11 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python Debugger: Current File",
+            "name": "FastAPI Dev",
             "type": "debugpy",
             "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal"
+            "module": "fastapi",
+            "args": [
+                "dev",
+                "src/main.py"
+            ],
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/src"
+            }
         }
     ]
 }

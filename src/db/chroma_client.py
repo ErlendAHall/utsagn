@@ -42,26 +42,24 @@ class UtsagnDBClient:
         :return: Returns a QueryResult
         :rtype: QueryResult
         """
-        if isinstance(query_text, str):
-            self.collection.peek([query_text])
-        else:
-            self.collection.query(query_text)
+        self.collection.query(query_text)
 
     def write_utsagn(self, utsagn: Utsagn) -> bool:
         # Use a md5 digest from the statement and the speaker.
         # Presumably, it is possible that a speaker can perform an identical statement.
-        data = utsagn["statement"] + utsagn["speaker"] + utsagn["date_found"]
+
+        data = utsagn.statement + utsagn.speaker + utsagn.date_found
         id = md5(data.encode("utf-8")).hexdigest()
 
         try:
             self.collection.upsert(
                 ids=[id],
-                documents=[utsagn["statement"]],
+                documents=[utsagn.statement],
                 metadatas=[{
-                    "date_found": utsagn["date_found"],
-                    "party": utsagn["party"],
-                    "source": utsagn["source"],
-                    "speaker": utsagn["speaker"]
+                    "date_found": utsagn.date_found,
+                    "party": utsagn.party,
+                    "source": utsagn.source,
+                    "speaker": utsagn.speaker
                 }]
             )
             return True
