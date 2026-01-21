@@ -1,16 +1,21 @@
 from hashlib import md5
 import os
 from chromadb import Collection, PersistentClient, QueryResult
-from chromadb.utils.embedding_functions import DefaultEmbeddingFunction
 from db.seed import seed
 from models.utsagn import Utsagn
 env = os.getenv("ENV")
 
-
 class UtsagnDBClient:
     def __init__(self) -> None:
+
+        persistent_path = os.getenv("CHROMA_PERSISTENT_LOCATION")
+        if (persistent_path is None) or (persistent_path == ""):
+            raise ValueError(
+                "CHROMA_PERSISTENT_LOCATION environment variable is not set."
+            )
+        
         self.chroma_client = PersistentClient(
-            path=os.getenv("CHROMA_PERSISTENT_LOCATION")
+            path=persistent_path
         )
 
         self.collection = self.__init_collection()
@@ -18,7 +23,8 @@ class UtsagnDBClient:
     def __init_collection(self) -> Collection:
         utsagn_collection = self.chroma_client.get_or_create_collection(
             name="utsagn",
-            embedding_function=DefaultEmbeddingFunction(),
+            # https://docs.trychroma.com/docs/embeddings/embedding-functions#default-all-minilm-l6-v2
+            # embedding_function=DefaultEmbeddingFunction(),
             metadata={
                 "description": "En database med politiske utsagn.",
             },
@@ -42,7 +48,7 @@ class UtsagnDBClient:
         :return: Returns a QueryResult
         :rtype: QueryResult
         """
-        self.collection.query(query_text)
+        return self.collection.query(query_texts=query_text)
 
     def write_utsagn(self, utsagn: Utsagn) -> bool:
         # Use a md5 digest from the statement and the speaker.
